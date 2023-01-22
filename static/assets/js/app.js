@@ -99,8 +99,8 @@ var web3 = new Web3(window.ethereum);
 // var Contract = require('web3-eth-contract');
 var acc = null;
 // var key 0xcC0D6FEaC2dbb9bFa7F5dc438F0CE089757A1e0c  0x00FE0b15775bCa92f7414D7aD9a1A0426b3C347F 0xB59fb2cC2789B805A0341C13751d56c657A938e4 0x21dac808379CceD51ce7D15bFb9DACbF895F1064
-// 0x7eccC24A5000c64C96994F759b033bDA5c9bBE3F
-var contract_addr = "0x1623388Bda883e7Ef661e76eedDf1183F79cd65f"
+// 0x1623388Bda883e7Ef661e76eedDf1183F79cd65f
+var contract_addr = "0x7eccC24A5000c64C96994F759b033bDA5c9bBE3F"
 window.onload = function () {
     connectt();
 };
