@@ -5,7 +5,6 @@ pragma solidity >=0.4.1 <=0.9.0;
 contract mini {
     
     struct borower {
-        // uint256 score;
         string name;
         string email;
         address[] borrower_list;
@@ -15,13 +14,15 @@ contract mini {
         string gender;
         uint256 a_income;
         uint256 no_of_dependents;
-        // uint256 loan_amountt;
-        // string l_purpose;
+        uint256[] loan_ids;
         uint256 received_ammount;
-        // uint256 roi;
         uint256 creditscore;
         uint256 creditworthiness;
-        // uint256 term;
+        lenders len;
+    }
+    struct lenders{
+        address[] lenders_addr;
+        uint256 amount;
     }
 
     struct lender {
@@ -30,41 +31,36 @@ contract mini {
         address[] lender_list;
         string pan;
         string email;
+        string[] funded_ids;
+        borrowers bor;
+    }
+    struct borrowers{
+        address[] borrower_addr;
+        uint256 amount;
     }
 
-    struct app_loans{
-        uint256 loan_id;
+    struct loan_applications{
+        uint256 loan_idd;
         address borrower_ac_address;
-        var roii;
+        string roii;
         uint256 loan_amountt;
-        string l_purpose;
+        uint256 l_purpose;
         uint256 term;
         address lender_acc;
+        address[] lender_accss;
     }
 
 
-    address[] loans;
+    uint256[] public loans;
     address[] public borower_list;
     address[] public lender_list;
     address[] public approved_loans;
 
     mapping(address => borower) borowerInfo;
+    mapping(uint256 => loan_applications) loans_datas;
     mapping(address => lender) lenderInfo;
-    // uint256 PAISA = 10 * 1e10;
-    uint256 aa = 1;
 
-function user(
-        string memory name,
-        string memory email,
-        uint256 pos,
-        string memory aadhar,
-        string memory pan,
-        // uint256 score,
-        uint256 phone,
-        string memory gender,
-        uint256 a_income,
-        uint256 no_of_depeden
-    ) public returns (string memory) {
+    function user(string memory name,string memory email,uint256 pos,string memory aadhar,string memory pan,uint256 phone,string memory gender,uint256 a_income,uint256 no_of_depeden) public returns (string memory) {
         address addr = msg.sender;
         if (pos == 0) {
             borower memory b;
@@ -72,17 +68,11 @@ function user(
             b.aadhar = aadhar;
             b.email = email;
             b.pan = pan;
-            // b.score = score;
             b.phone = phone;
             b.gender = gender;
             b.a_income = a_income;
             b.no_of_dependents = no_of_depeden;
-            // b.loan_amountt = 0;
-            // b.l_purpose = "";
-            b.received_ammount=0;
-            // b.roi=0;
             borowerInfo[msg.sender] = b;
-            // b.received_ammount=0;
             borower_list.push(addr);
             return name;
         } else if (pos == 1) {
@@ -96,118 +86,69 @@ function user(
             revert();
         }
     }
-    function sendmoneyy(address payable to)
-        public
-        payable
-        returns (uint256)
-    {
-        borowerInfo[to].received_ammount=msg.value;
+
+
+    function approved_loan_ids(uint256 lo_amount,uint256 lo_purpose,uint termmm,string memory roiii,uint creditscore,uint creditworthiness)public{
+        address a=msg.sender;
+        uint256 b_num=block.number;
+        loans_datas[b_num].loan_amountt=lo_amount;
+        loans_datas[b_num].borrower_ac_address=a;
+        loans_datas[b_num].roii=roiii;
+        loans_datas[b_num].loan_idd=b_num;
+        loans_datas[b_num].loan_amountt=lo_amount;
+        loans_datas[b_num].l_purpose=lo_purpose;
+        loans_datas[b_num].term=termmm;
+        borowerInfo[a].creditworthiness=creditworthiness;
+        borowerInfo[a].creditscore=creditscore;
+
+
+
+    }
+
+    function get()public view returns(uint256[] memory){
+        return  borowerInfo[msg.sender].loan_ids;
+    }
+
+    function get_loann(uint256 b_num)public view returns(uint256 ,address,string memory,uint256,uint256,uint256,address){
+
+        return (
+        loans_datas[b_num].loan_idd,
+        loans_datas[b_num].borrower_ac_address,
+        loans_datas[b_num].roii,
+        loans_datas[b_num].loan_amountt,
+        loans_datas[b_num].l_purpose,
+        loans_datas[b_num].term,
+        loans_datas[b_num].lender_acc
+        );
+    }
+
+    function sendmoneyy(address payable to,uint256 b_num)public payable returns (uint256) {   
+        loans_datas[b_num].lender_accss.push(msg.sender);
+        loans_datas[b_num].loan_amountt=loans_datas[b_num].loan_amountt-msg.value;
         to.transfer(msg.value);
         return msg.value;
     }
 
-
-
-    function getBalance() public view returns (uint256, uint256) {
-        return (aa, block.timestamp);
-    }
-
-    function l_l() public view returns (address[] memory) {
-        return loans;
-    }
-
-    function get_borrower(address addr)
-        public
-        view
-        returns (
-            string memory,string memory,
-            // uint256,
-            // string memory,
-            uint256,uint256,uint256,uint256,
-            // uint256,
-            // uint256,
-            uint256,uint256
-        )
+    function get_borrower(address addr)public view returns (string memory,string memory,uint256,uint256,
+    uint256,uint256,uint256,uint256,uint256[] memory )
     {
         borower memory bb = borowerInfo[addr];
         return (
             bb.name,
             bb.aadhar,
-            // bb.loan_amountt,
-            // bb.l_purpose,
            bb.a_income,
            bb.no_of_dependents,
            bb.phone,
            bb.received_ammount,
-        //    bb.roi,
-           bb.creditworthiness,
            bb.creditscore,
-        //    bb.term
-        );
-    }
-    function get_approvedLoans() public view returns(address[] memory){
-        return approved_loans;
-    }
-    function add_approved_loan(address a)public {
-        approved_loans.push(a);
-    }
-
-    function add_loan(hash id,address adr,var roii,uint256 loan_amountt,uint256 ll_purpose,uint term,address ll_account)public {
-      app_loan memory a;
-         a.loan_id=id;
-        a.borrower_ac_address=addr;
-        a.roii=roii;
-        a.loan_amountt=loan_amountt;
-        a.l_purpose=ll_purpose;
-        a.term-term;
-        a.lender_acc=ll_account;
-    }
-
-    function get_loan_details(hash id)public returns(){
-        app_loans.loan_id;
-        app_loans.borrower_ac_address=addr;
-        app_loans.roii=roii;
-        app_loans.loan_amountt=loan_amountt;
-        app_loans.l_purpose=ll_purpose;
-        app_loans.term-term;
-        app_loans.lender_acc=ll_account;
-
-    }
-
-
-
-    function loan_data(address addr)
-        public
-        view
-        returns (
-            string memory,
-            uint256,
-            uint256 ,uint256,uint256,uint256,uint256
-        )
-    {
-        return (
-            borowerInfo[addr].l_purpose,
-            borowerInfo[addr].loan_amountt,
-            borowerInfo[addr].received_ammount,
-            borowerInfo[addr].roi,
-            borowerInfo[addr].creditscore,
-            borowerInfo[addr].creditworthiness,
-            borowerInfo[addr].term
-            
-            
+           bb.creditworthiness,
+           bb.loan_ids
+     
         );
     }
 
-    function get_lender(address addr)
-        public
-        view
-        returns (
-            string memory,
-            string memory,
-            string memory,
-            string memory
-        )
-    {
+ 
+    function get_lender(address addr)public view returns (string memory,string memory,string memory,string memory){
         return (
             lenderInfo[addr].name,
             lenderInfo[addr].email,
@@ -224,23 +165,4 @@ function user(
         return lender_list;
     }
 
-    function reg_loan(
-        address acc_address,
-        uint256 l_amount,
-        string memory purpose,uint term,uint creditworthiness,uint creditscore,uint256 roi
-    ) public {
-        borowerInfo[acc_address].loan_amountt = l_amount;
-        borowerInfo[acc_address].l_purpose = purpose;
-        borowerInfo[acc_address].received_ammount=0;
-        borowerInfo[acc_address].roi=roi;
-        borowerInfo[acc_address].term=term;
-        borowerInfo[acc_address].creditworthiness=creditworthiness;
-        borowerInfo[acc_address].creditscore=creditscore;
-        
-        loans.push(acc_address);
-       }  
-
-
-
-       
     }
